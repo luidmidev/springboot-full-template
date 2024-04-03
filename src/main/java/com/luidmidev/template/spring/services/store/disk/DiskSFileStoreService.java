@@ -1,4 +1,4 @@
-package com.luidmidev.template.spring.services.store.storage;
+package com.luidmidev.template.spring.services.store.disk;
 
 import com.luidmidev.template.spring.services.store.FileStoreService;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,10 +12,10 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 @Service
-public class StorageStoreService implements FileStoreService {
+public class DiskSFileStoreService implements FileStoreService {
     private final String storagePath;
 
-    public StorageStoreService(@Value("${filestorage.path}") String storagePath) {
+    public DiskSFileStoreService(@Value("${filestorage.path}") String storagePath) {
         if (storagePath.contains("{user.dir}")) {
             this.storagePath = storagePath.replace("{user.dir}", System.getProperty("user.dir"));
         } else {

@@ -1,4 +1,4 @@
-package com.luidmidev.template.spring.services;
+package com.luidmidev.template.spring.services.users;
 
 
 import com.luidmidev.template.spring.dto.Register;
@@ -9,6 +9,7 @@ import com.luidmidev.template.spring.repositories.UserRepository;
 import com.luidmidev.template.spring.security.Argon2CustomPasswordEncoder;
 import com.luidmidev.template.spring.security.jwt.Jwt;
 import com.luidmidev.template.spring.services.emails.EmailSenderService;
+import com.luidmidev.template.spring.services.users.SessionAuditService;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

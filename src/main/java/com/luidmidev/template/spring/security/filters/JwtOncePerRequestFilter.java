@@ -3,7 +3,7 @@ package com.luidmidev.template.spring.security.filters;
 import com.luidmidev.template.spring.exceptions.ErrorResponse;
 import com.luidmidev.template.spring.security.UserDetailsAuthenticaction;
 import com.luidmidev.template.spring.security.jwt.Jwt;
-import com.luidmidev.template.spring.services.UserService;
+import com.luidmidev.template.spring.services.users.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;

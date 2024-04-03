@@ -24,15 +24,11 @@ public interface FileStoreService {
     void remove(String id);
 
     default void purge(PurgableFileStore purgable) {
-        for (var id : purgable.filesId()) {
-            remove(id);
-        }
+        for (var id : purgable.filesId()) remove(id);
     }
 
     default void purge(Iterable<? extends PurgableFileStore> purgables) {
-        for (var purgable : purgables) {
-            purge(purgable);
-        }
+        for (var purgable : purgables) purge(purgable);
     }
 
     default String guessContentType(String filename) {

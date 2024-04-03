@@ -3,7 +3,7 @@ package com.luidmidev.template.spring.controllers;
 
 import com.luidmidev.template.spring.dto.UpdateUser;
 import com.luidmidev.template.spring.models.User;
-import com.luidmidev.template.spring.services.UserService;
+import com.luidmidev.template.spring.services.users.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

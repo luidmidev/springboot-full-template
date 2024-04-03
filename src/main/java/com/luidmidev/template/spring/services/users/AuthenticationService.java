@@ -1,4 +1,4 @@
-package com.luidmidev.template.spring.services;
+package com.luidmidev.template.spring.services.users;
 
 
 import com.luidmidev.template.spring.dto.Login;
@@ -31,7 +31,7 @@ public class AuthenticationService {
     private final EmailSenderService emailSenderService;
     private final SessionAuditService sessionAuditService;
     private final Argon2CustomPasswordEncoder encoder;
-    private final Jwt jwtutil;
+    private final Jwt jwt;
 
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
@@ -42,7 +42,7 @@ public class AuthenticationService {
         this.userRepository = userRepository;
         this.forgetPasswordRepository = forgetPasswordRepository;
         this.emailSenderService = emailSenderService;
-        this.jwtutil = jwt;
+        this.jwt = jwt;
         this.authenticationManager = authenticationManager;
         this.sessionAuditService = sessionAuditService;
         this.encoder = encoder;
@@ -74,7 +74,7 @@ public class AuthenticationService {
         var authenticationToken = UsernamePasswordAuthenticationToken.unauthenticated(login.getUsername().trim(), login.getPassword());
         var authentication = authenticationManager.authenticate(authenticationToken);
         var user = (User) authentication.getPrincipal();
-        var jwt = jwtutil.create(user.getId().toString(), user.getUsername());
+        var jwt = this.jwt.create(user.getId().toString(), user.getUsername());
         sessionAuditService.saveActionUser(user, "Inicio de sesión");
         return jwt;
     }

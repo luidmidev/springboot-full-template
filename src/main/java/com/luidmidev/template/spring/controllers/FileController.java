@@ -77,7 +77,7 @@ public class FileController {
     }
 
     @GetMapping("/info/{id}")
-    public ResponseEntity<FileInfo> info(@PathVariable String id) {
+    public ResponseEntity<FileInfo> info(@PathVariable String id) throws IOException {
         var loadFile = fileStoreService.info(id);
         return ResponseEntity.ok(loadFile);
     }

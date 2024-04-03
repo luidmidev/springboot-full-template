@@ -1,7 +1,5 @@
-package com.luidmidev.template.spring.exceptions.handlers;
+package com.luidmidev.template.spring.exceptions;
 
-import com.luidmidev.template.spring.exceptions.ErrorResponse;
-import com.luidmidev.template.spring.exceptions.ClientException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
