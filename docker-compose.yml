@@ -1,0 +1,23 @@
+#docker compose
+version: '3.8'
+#ejecutar primero:
+# docker build -t mi-aplicacion .
+
+services:
+
+  mongodb:
+    container_name: mongodb
+    hostname: mongodb
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+
+  secondary_spring_server:
+    container_name: secondary_spring_server
+    image: mi-aplicacion
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/pms
+    depends_on:
+      - mongodb
