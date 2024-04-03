@@ -76,17 +76,27 @@ public class WebSecurityConfig {
                         antMatcher(HttpMethod.GET, "/files/**")
                 ).permitAll()
                 .requestMatchers(
-                        "/"
+                        "/",
+                        "/authenticate",
+                        "/register",
+                        "/forgot-password",
+                        "/reset-password"
                 ).permitAll()
+                .requestMatchers(
+                        "/update",
+                        "/whoami"
+                ).authenticated()
                 .anyRequest().authenticated()
 
         );
 
 
         log.info("Configurando filtro de autenticación básica");
+
         http.httpBasic(basic -> basic.authenticationEntryPoint((request, response, authException) -> {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
             response.getWriter().write(ErrorResponse.jsonOf("No autorizado", HttpStatus.UNAUTHORIZED));
         }));
 
@@ -103,7 +113,10 @@ public class WebSecurityConfig {
 
 
         log.info("Configurando filtro de autenticación básica");
-        http.httpBasic(basic -> basic.authenticationEntryPoint((request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage())));
+        http.httpBasic(basic -> basic
+                .authenticationEntryPoint((request, response, authException) -> response
+                        .sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage()))
+        );
 
         return http.build();
     }
