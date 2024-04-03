@@ -1,7 +1,6 @@
 package com.luidmidev.template.spring.services.store;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.apache.tika.Tika;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,13 +15,11 @@ public interface FileStoreService {
 
     String store(InputStream upload, String filename) throws IOException;
 
-    String replace(InputStream upload, String filename) throws IOException;
-
     String storeEphimeral(InputStream upload, String filename) throws IOException;
 
     DownloadedFile download(String id) throws IOException;
 
-    FileInfo info(String id);
+    FileInfo info(String id) throws IOException;
 
     void remove(String id);
 
@@ -44,11 +41,21 @@ public interface FileStoreService {
 
 
     @EqualsAndHashCode(callSuper = true)
+    @NoArgsConstructor
     @Data
     class DownloadedFile extends FileInfo {
         private byte[] file;
+
+        @Builder
+        public DownloadedFile(String filename, String fileType, Long fileSize, byte[] file) {
+            super(filename, fileType, fileSize);
+            this.file = file;
+        }
     }
 
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     @Data
     class FileInfo {
         private String filename;

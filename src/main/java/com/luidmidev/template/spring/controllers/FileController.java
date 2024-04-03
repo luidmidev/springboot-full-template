@@ -4,7 +4,7 @@ package com.luidmidev.template.spring.controllers;
 import com.luidmidev.template.spring.exceptions.ClientException;
 import com.luidmidev.template.spring.services.store.FileStoreService;
 import com.luidmidev.template.spring.services.store.FileStoreService.FileInfo;
-import com.luidmidev.template.spring.services.store.GridFSFileStoreService;
+import com.luidmidev.template.spring.services.store.mongo.GridFSFileStoreService;
 import com.luidmidev.template.spring.utils.StringUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;

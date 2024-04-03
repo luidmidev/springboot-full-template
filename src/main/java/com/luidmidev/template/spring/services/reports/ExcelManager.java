@@ -1,4 +1,4 @@
-package com.luidmidev.template.spring.reports;
+package com.luidmidev.template.spring.services.reports;
 
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.CellValue;

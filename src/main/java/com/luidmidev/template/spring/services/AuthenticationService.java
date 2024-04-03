@@ -9,7 +9,7 @@ import com.luidmidev.template.spring.models.User;
 import com.luidmidev.template.spring.repositories.TokenForgetPasswordRepository;
 import com.luidmidev.template.spring.repositories.UserRepository;
 import com.luidmidev.template.spring.security.Argon2CustomPasswordEncoder;
-import com.luidmidev.template.spring.security.jwt.JWT;
+import com.luidmidev.template.spring.security.jwt.Jwt;
 import com.luidmidev.template.spring.services.emails.EmailSenderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,13 +31,13 @@ public class AuthenticationService {
     private final EmailSenderService emailSenderService;
     private final SessionAuditService sessionAuditService;
     private final Argon2CustomPasswordEncoder encoder;
-    private final JWT jwtutil;
+    private final Jwt jwtutil;
 
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     @Autowired
-    public AuthenticationService(UserRepository userRepository, TokenForgetPasswordRepository forgetPasswordRepository, EmailSenderService emailSenderService, JWT jwt, AuthenticationManager authenticationManager, SessionAuditService sessionAuditService, Argon2CustomPasswordEncoder encoder) {
+    public AuthenticationService(UserRepository userRepository, TokenForgetPasswordRepository forgetPasswordRepository, EmailSenderService emailSenderService, Jwt jwt, AuthenticationManager authenticationManager, SessionAuditService sessionAuditService, Argon2CustomPasswordEncoder encoder) {
 
         this.userRepository = userRepository;
         this.forgetPasswordRepository = forgetPasswordRepository;

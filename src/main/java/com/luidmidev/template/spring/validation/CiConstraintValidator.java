@@ -35,13 +35,11 @@ public class CiConstraintValidator implements ConstraintValidator<Ci, String> {
     public static boolean validateCi(String cedulaString) {
 
         try {
-            if (cedulaString == null) {
-                return false;
-            }
+            if (cedulaString == null) return false;
 
-            if (cedulaString.length() != 10) {
-                return false;
-            }
+
+            if (cedulaString.length() != 10) return false;
+
 
             int[] cedula = cedulaString.chars().map(Character::getNumericValue).toArray();
 

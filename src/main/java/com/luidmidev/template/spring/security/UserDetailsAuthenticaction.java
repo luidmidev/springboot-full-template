@@ -18,11 +18,6 @@ public class UserDetailsAuthenticaction implements Authentication {
         setAuthenticated(true);
     }
 
-    public UserDetailsAuthenticaction(UserDetails user, boolean authenticated) {
-        this.user = user;
-        this.authenticated = authenticated;
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return user.getAuthorities();

@@ -1,5 +1,6 @@
-package com.luidmidev.template.spring.services.store;
+package com.luidmidev.template.spring.services.store.mongo;
 
+import com.luidmidev.template.spring.services.store.FileStoreService;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -51,11 +52,6 @@ public class GridFSFileStoreService implements FileStoreService {
 
     public String store(InputStream upload, String filename) throws IOException {
         return internalAddFile(upload, filename, false);
-    }
-
-    @Override
-    public String replace(InputStream upload, String filename) {
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     public String storeEphimeral(InputStream upload, String filename) throws IOException {
@@ -129,23 +125,5 @@ public class GridFSFileStoreService implements FileStoreService {
     public void remove(String id) {
         template.delete(new Query(Criteria.where("_id").is(id)));
     }
-
-    /**
-     * Elimina un archivo del almacenamiento.
-     *
-     * @param filename Nombre del archivo a eliminar.
-     */
-    @Override
-    public void removeByFilename(String filename) {
-
-        if (filename == null) return;
-
-        var query = new Query();
-        query.addCriteria(Criteria.where("filename").is(filename));
-        query.limit(1);
-
-        template.delete(query);
-    }
-
 
 }

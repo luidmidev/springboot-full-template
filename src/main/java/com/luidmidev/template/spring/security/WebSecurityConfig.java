@@ -1,14 +1,17 @@
 package com.luidmidev.template.spring.security;
 
 
-import com.luidmidev.template.spring.security.filters.JWTOncePerRequestFilter;
+import com.luidmidev.template.spring.exceptions.ErrorResponse;
+import com.luidmidev.template.spring.security.filters.JwtOncePerRequestFilter;
 import com.luidmidev.template.spring.services.UserService;
+import com.luidmidev.template.spring.utils.EnvironmentChecker;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -36,15 +39,16 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 @EnableWebSecurity
 public class WebSecurityConfig {
     private final UserService securityUserDetailsService;
-    private final JWTOncePerRequestFilter jwtAuthenticationFilter;
+    private final JwtOncePerRequestFilter jwtAuthenticationFilter;
     private final Argon2CustomPasswordEncoder argon2CustomPasswordEncoder;
-
+    private final EnvironmentChecker environmentChecker;
 
     @Autowired
-    WebSecurityConfig(UserService securityUserDetailsService, JWTOncePerRequestFilter jwtAuthenticationFilter, Argon2CustomPasswordEncoder argon2CustomPasswordEncoder) {
+    WebSecurityConfig(UserService securityUserDetailsService, JwtOncePerRequestFilter jwtAuthenticationFilter, Argon2CustomPasswordEncoder argon2CustomPasswordEncoder, EnvironmentChecker environmentChecker) {
         this.securityUserDetailsService = securityUserDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.argon2CustomPasswordEncoder = argon2CustomPasswordEncoder;
+        this.environmentChecker = environmentChecker;
     }
 
     /**
@@ -69,56 +73,23 @@ public class WebSecurityConfig {
         log.info("Configurando autorización de solicitudes HTTP");
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                        antMatcher(HttpMethod.GET, "/files/**"),
-                        antMatcher(HttpMethod.POST, "/questions")
+                        antMatcher(HttpMethod.GET, "/files/**")
                 ).permitAll()
                 .requestMatchers(
-                        "/",
-                        "/guanabana/model",
-                        "/guanabana/calculate",
-                        "/platano/model",
-                        "/platano/calculate",
-                        "/authenticate",
-                        "/register",
-                        "/reset-password",
-                        "/forgot-password",
-                        "/index.html",
-                        "/favicon.ico",
-                        "/vite.svg",
-                        "/assets/**",
-                        "/android-chrome-192x192.png",
-                        "/android-chrome-512x512.png",
-                        "/apple-touch-icon.png",
-                        "/browserconfig.xml",
-                        "/favicon.ico",
-                        "/mstile-150x150.png",
-                        "/safari-pinned-tab.svg",
-                        "/site.webmanifest",
-                        "/login",
-                        "/registrarse",
-                        "/recuperar-contrasena",
-                        "/precios-minimos",
-                        "/proyectos",
-                        "/calculadora/**",
-                        "/static/**",
-                        "/census/**",
-                        "/census",
-                        "/censo-guanaba",
-                        "/censo-guanaba/**",
-                        "/censo-guanabana",
-                        "/geographic-data-ec/**",
-                        "/geographic-data-ec"
+                        "/"
                 ).permitAll()
                 .anyRequest().authenticated()
 
         );
 
 
-//        http.formLogin(form -> form
-//                .loginPage("/login")
-//                .successHandler((request, response, authentication) -> response.sendRedirect("/"))
-//                .permitAll()
-//        );
+        log.info("Configurando filtro de autenticación básica");
+        http.httpBasic(basic -> basic.authenticationEntryPoint((request, response, authException) -> {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write(ErrorResponse.jsonOf("No autorizado", HttpStatus.UNAUTHORIZED));
+        }));
+
 
         log.info("Configurando autenticación");
         http.sessionManagement(sesion -> sesion
@@ -149,13 +120,13 @@ public class WebSecurityConfig {
         var source = new UrlBasedCorsConfigurationSource();
         var configuration = new CorsConfiguration();
 
-        //if (environmentChecker.isProduction()) {
-        //    log.info("Configurando origen cruzado para producción");
-        //    configuration.setAllowedOrigins(List.of("https://localhost:80"));
-        //} else {
-        log.info("Configurando origen cruzado para desarrollo");
-        configuration.setAllowedOrigins(List.of("*"));
-        //}
+        if (environmentChecker.isProduction()) {
+            log.info("Configurando origen cruzado para producción");
+            configuration.setAllowedOrigins(List.of("https://localhost:80"));
+        } else {
+            log.info("Configurando origen cruzado para desarrollo");
+            configuration.setAllowedOrigins(List.of("*"));
+        }
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(List.of("*"));

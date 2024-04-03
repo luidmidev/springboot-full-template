@@ -2,7 +2,7 @@ package com.luidmidev.template.spring.security.filters;
 
 import com.luidmidev.template.spring.exceptions.ErrorResponse;
 import com.luidmidev.template.spring.security.UserDetailsAuthenticaction;
-import com.luidmidev.template.spring.security.jwt.JWT;
+import com.luidmidev.template.spring.security.jwt.Jwt;
 import com.luidmidev.template.spring.services.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -27,8 +27,8 @@ import java.io.IOException;
  */
 @Log4j2
 @Component
-public class JWTOncePerRequestFilter extends OncePerRequestFilter {
-    private final JWT jwt;
+public class JwtOncePerRequestFilter extends OncePerRequestFilter {
+    private final Jwt jwt;
     private final UserService userDetailsService;
 
 
@@ -38,7 +38,7 @@ public class JWTOncePerRequestFilter extends OncePerRequestFilter {
      * @param jwt            the jwt util
      * @param userDetailsService the user details service
      */
-    public JWTOncePerRequestFilter(JWT jwt, UserService userDetailsService) {
+    public JwtOncePerRequestFilter(Jwt jwt, UserService userDetailsService) {
         this.jwt = jwt;
         this.userDetailsService = userDetailsService;
     }

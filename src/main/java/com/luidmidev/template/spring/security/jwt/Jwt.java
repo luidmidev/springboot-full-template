@@ -17,7 +17,7 @@ import java.util.function.Function;
  */
 @Log4j2
 @Component
-public class JWT {
+public class Jwt {
 
     /**
      * Clave secreta utilizada para firmar los tokens JWT.
@@ -37,6 +37,13 @@ public class JWT {
     @Value("${security.jwt.ttlMillis}")
     private long ttlMillis;
 
+    private final SecretKey signingKey = getSigningKey();
+
+    private SecretKey getSigningKey() {
+        var apiKeySecretBytes = DatatypeConverter.parseBase64Binary(key); // Clave secreta en bytes
+        return new SecretKeySpec(apiKeySecretBytes, "HmacSHA256"); // Clave secreta para firmar el token
+    }
+
     /**
      * Crea un token JWT con el nombre de usuario y el correo electrónico proporcionados.
      *
@@ -51,7 +58,6 @@ public class JWT {
 
         var nowMillis = System.currentTimeMillis();
         var now = new Date(nowMillis);
-        var signingKey = getSigningKey();
 
         var builder = Jwts.builder()
                 .id(id) // ID del token
@@ -66,11 +72,6 @@ public class JWT {
             builder.expiration(exp);
         }
         return builder.compact();
-    }
-
-    private SecretKey getSigningKey() {
-        var apiKeySecretBytes = DatatypeConverter.parseBase64Binary(key); // Clave secreta en bytes
-        return new SecretKeySpec(apiKeySecretBytes, "HmacSHA256"); // Clave secreta para firmar el token
     }
 
 
@@ -117,7 +118,7 @@ public class JWT {
      */
     private Claims getAllClaims(String jwt) {
         return Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(signingKey)
                 .build()
                 .parseSignedClaims(jwt)
                 .getPayload();

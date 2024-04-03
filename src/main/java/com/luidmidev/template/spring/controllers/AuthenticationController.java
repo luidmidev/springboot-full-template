@@ -12,9 +12,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
-
 /**
  * Controlador para la autenticación y gestión de usuarios.
  */
@@ -39,7 +36,7 @@ public class AuthenticationController {
     @PostMapping(value = "/authenticate")
     public ResponseEntity<String> authenticate(@RequestBody Login login) {
         var jwt = service.authenticate(login);
-        return ResponseEntity.status(OK).body(jwt);
+        return ResponseEntity.ok().body(jwt);
     }
 
     /**
@@ -51,7 +48,7 @@ public class AuthenticationController {
     @PostMapping(value = "/register")
     public ResponseEntity<String> register(@Valid @RequestBody Register register) {
         var jwt = userService.register(register);
-        return ResponseEntity.status(CREATED).body(jwt);
+        return ResponseEntity.ok().body(jwt);
     }
 
     /**
@@ -64,7 +61,7 @@ public class AuthenticationController {
     @PutMapping(value = "/update")
     public ResponseEntity<String> update(@Valid @RequestBody Register register, @AuthenticationPrincipal User principals) {
         userService.update(register, principals);
-        return ResponseEntity.status(CREATED).body("Actualizado");
+        return ResponseEntity.ok().body("Actualizado");
 
     }
 
@@ -77,7 +74,7 @@ public class AuthenticationController {
     @PostMapping(value = "/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestParam String email) {
         service.forgotPassword(email);
-        return ResponseEntity.status(CREATED).body("Hemos enviado un correo electrónico con el codigo de recuperación de cuenta");
+        return ResponseEntity.ok().body("Hemos enviado un correo electrónico con el codigo de recuperación de cuenta");
     }
 
 
@@ -89,7 +86,7 @@ public class AuthenticationController {
     @PostMapping(value = "/reset-password")
     public ResponseEntity<String> resetPassword(@Valid @RequestBody RecoveryPasswordData data) {
         service.resetPassword(data);
-        return ResponseEntity.status(CREATED).body("Se ha actualizado su contraseña");
+        return ResponseEntity.ok().body("Se ha actualizado su contraseña");
     }
 
     /**

@@ -7,7 +7,7 @@ import com.luidmidev.template.spring.exceptions.ClientException;
 import com.luidmidev.template.spring.models.User;
 import com.luidmidev.template.spring.repositories.UserRepository;
 import com.luidmidev.template.spring.security.Argon2CustomPasswordEncoder;
-import com.luidmidev.template.spring.security.jwt.JWT;
+import com.luidmidev.template.spring.security.jwt.Jwt;
 import com.luidmidev.template.spring.services.emails.EmailSenderService;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,14 +35,14 @@ public class UserService implements UserDetailsService {
     private final EmailSenderService emailSenderService;
     private final Argon2CustomPasswordEncoder encoder;
     private final SessionAuditService sessionAuditService;
-    private final JWT JWTUtil;
+    private final Jwt jwtutil;
 
-    UserService(UserRepository repository, EmailSenderService emailSenderService, Argon2CustomPasswordEncoder encoder, SessionAuditService sessionAuditService, JWT jwtUtil) {
+    UserService(UserRepository repository, EmailSenderService emailSenderService, Argon2CustomPasswordEncoder encoder, SessionAuditService sessionAuditService, Jwt jwtUtil) {
         this.repository = repository;
         this.emailSenderService = emailSenderService;
         this.encoder = encoder;
         this.sessionAuditService = sessionAuditService;
-        JWTUtil = jwtUtil;
+        jwtutil = jwtUtil;
     }
 
     public Iterable<User> findAll() {
@@ -126,7 +126,7 @@ public class UserService implements UserDetailsService {
 
         var usersaved = repository.save(user);
 
-        var jwt = JWTUtil.create(usersaved.getId().toString(), usersaved.getUsername());
+        var jwt = jwtutil.create(usersaved.getId().toString(), usersaved.getUsername());
 
         sessionAuditService.saveActionUser(usersaved, "Registro de usuario");
         emailSenderService.sendSimpleMail(register.getEmail(), "BIENVENIDO A TURISMO URCUQUÍ", "Gracias por registrarse en nuestra aplicacion de realidad aumentada, esperamos que disfrute de su experiencia");

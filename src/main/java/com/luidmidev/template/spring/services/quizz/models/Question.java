@@ -8,6 +8,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Path;
 import lombok.Data;
+import lombok.NonNull;
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 
 import java.util.*;
@@ -102,6 +103,8 @@ public class Question {
             var errorMessage = validation.apply(object);
             if (errorMessage != null) {
                 Path propertyPath = new Path() {
+
+                    @NonNull
                     @Override
                     public Iterator<Node> iterator() {
                         return Collections.emptyIterator();
@@ -123,7 +126,7 @@ public class Question {
     }
 
     public enum QuestionType {
-        TEXT, SELECT, MULTIPLE_SELECT, RADIO, CHECKBOX, NUMBER, LOCATION, TEL, CUSTOM
+        TEXT, SELECT, RADIO, CHECKBOX, NUMBER, LOCATION, TEL, CUSTOM
 
     }
 

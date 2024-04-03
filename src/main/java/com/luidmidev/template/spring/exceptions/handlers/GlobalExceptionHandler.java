@@ -21,7 +21,6 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @ControllerAdvice
@@ -58,13 +57,13 @@ public class GlobalExceptionHandler {
                 .map(constraintViolationToER)
                 .toList();
 
-        return ResponseEntity.status(BAD_REQUEST).body(errors);
+        return ResponseEntity.badRequest().body(errors);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
         String errorMessage = "Error: El parámetro requerido '" + ex.getParameterName() + "' no está presente en la solicitud.";
-        return ResponseEntity.status(BAD_REQUEST).body(ErrorResponse.of(errorMessage, ex.getParameterName()));
+        return ResponseEntity.badRequest().body(ErrorResponse.of(errorMessage, ex.getParameterName()));
     }
 
     @ExceptionHandler(ClientException.class)
@@ -75,7 +74,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<List<ErrorResponse>> handleValidationException(MethodArgumentNotValidException ex) {
 
-
         List<ErrorResponse> errors = ex
                 .getBindingResult()
                 .getAllErrors()
@@ -83,7 +81,7 @@ public class GlobalExceptionHandler {
                 .map(objectErrorErrorToER)
                 .toList();
 
-        return ResponseEntity.status(BAD_REQUEST).body(errors);
+        return ResponseEntity.badRequest().body(errors);
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
@@ -95,7 +93,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException ex) {
         logger.warn("Se recibió una excepción de SQLIntegrityConstraintViolationException, se recomienda implementar el método onSQLIntegrityConstraintViolationException de la clase   GlobalExcepcionHandler para evitar fugas de información del esquema de base de datos: {}", ex.getMessage());
-        return ResponseEntity.status(BAD_REQUEST).body(ErrorResponse.of("Error en la consistencia de datos"));
+        return ResponseEntity.badRequest().body(ErrorResponse.of("Error en la consistencia de datos"));
     }
 
     public ResponseEntity<ErrorResponse> onDuplicateKey(String key) {
@@ -105,12 +103,12 @@ public class GlobalExceptionHandler {
         else if (key.contains("email")) message = "El usuario con ese correo electrónico ya existe";
         else message = "Error de duplicación de clave";
 
-        return ResponseEntity.status(BAD_REQUEST).body(ErrorResponse.of(message));
+        return ResponseEntity.badRequest().body(ErrorResponse.of(message));
     }
 
     @ExceptionHandler(HttpMessageNotWritableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotWritableException() {
-        return ResponseEntity.status(BAD_REQUEST).body(ErrorResponse.of("Error al escribir la respuesta"));
+        return ResponseEntity.badRequest().body(ErrorResponse.of("Error al escribir la respuesta"));
     }
 
 }
