@@ -40,13 +40,13 @@ public class PasswordConstraintValidator implements ConstraintValidator<Password
         }
 
         var validator = new PasswordValidator(MESSAGE_RESOLVER,
-                new LengthRule(8, 30), // regla para que la longitud de la contraseña sea entre 8 y 30 caracteres
-                new CharacterRule(UpperCase, 1), // regla para que la contraseña tenga al menos una mayúscula
-                new CharacterRule(LowerCase, 1), // regla para que la contraseña tenga al menos una minúscula
-                new CharacterRule(Digit, 1), // regla para que la contraseña tenga al menos un dígito
-                new CharacterRule(Special, 1), // regla para que la contraseña tenga al menos un caracter especial
-                new CharacterRule(Alphabetical, 1), // regla para que la contraseña tenga al menos un caracter alfabético
-                new WhitespaceRule() // regla para que la contraseña no tenga espacios en blanco
+                new LengthRule(8, 30),
+                new CharacterRule(UpperCase, 1),
+                new CharacterRule(LowerCase, 1),
+                new CharacterRule(Digit, 1),
+                new CharacterRule(Special, 1),
+                new CharacterRule(Alphabetical, 1),
+                new WhitespaceRule()
         );
 
 

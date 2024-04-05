@@ -9,8 +9,6 @@ import java.io.InputStream;
 
 public interface FileStoreService {
 
-    Tika TIKA = new Tika();
-
     String store(MultipartFile upload) throws IOException;
 
     String store(InputStream upload, String filename) throws IOException;
@@ -32,7 +30,7 @@ public interface FileStoreService {
     }
 
     default String guessContentType(String filename) {
-        return TIKA.detect(filename);
+        return new Tika().detect(filename);
     }
 
 

@@ -3,6 +3,7 @@ package com.luidmidev.template.spring.services.quizz.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.luidmidev.template.spring.services.quizz.QuestionType;
 import com.luidmidev.template.spring.services.quizz.validations.QValidator;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -13,8 +14,8 @@ import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 
 import java.util.*;
 import java.util.function.Function;
-
-import static com.luidmidev.template.spring.services.quizz.models.Question.QuestionType.*;
+//
+import static com.luidmidev.template.spring.services.quizz.QuestionType.*;
 
 
 @Data
@@ -34,6 +35,8 @@ public class Question {
 
     private List<? extends Function<Answer, String>> validations;
 
+    private String exceptionEnd = "Error en la pregunta: " + name + ", id: " + id + ". ";
+
     public Question(Long id, String name, QuestionType type) {
         this(id, name, type, new ArrayList<>());
     }
@@ -52,10 +55,11 @@ public class Question {
     }
 
     public Question(Long id, String name, QuestionType type, List<String> options, Boolean otherOption) {
-        this(id, name, type, options, otherOption, new QValidator[] {});
+        this(id, name, type, options, otherOption, new QValidator[]{});
     }
 
     public Question(Long id, String name, QuestionType type, List<String> options, boolean otherOption, QValidator... validations) {
+
         this.id = id;
         this.name = name;
         this.type = type;
@@ -69,34 +73,30 @@ public class Question {
         }
 
         if (options == null) {
-            throw new IllegalArgumentException("Options cannot be null: " + exceptionEnd());
+            throw new IllegalArgumentException("Options cannot be null: " + exceptionEnd);
         }
 
         if (options.isEmpty() && otherOption) {
-            throw new IllegalArgumentException("Other option is only allowed if there are options: " + exceptionEnd());
+            throw new IllegalArgumentException("Other option is only allowed if there are options: " + exceptionEnd);
         }
 
         if (!options.isEmpty() && type != CHECKBOX && type != SELECT && type != RADIO) {
-            throw new IllegalArgumentException("Options are only allowed for SELECT, RADIO and CHECKBOX types: " + exceptionEnd());
+            throw new IllegalArgumentException("Options are only allowed for SELECT, RADIO and CHECKBOX types: " + exceptionEnd);
         }
 
         if (Arrays.stream(validations).anyMatch(Objects::isNull)) {
-            throw new IllegalArgumentException("Validations cannot be null: " + exceptionEnd());
-        }
-
-        if (Arrays.stream(validations).anyMatch(validation -> validation.getName().equals("required"))) {
-            this.name = this.name + " *";
+            throw new IllegalArgumentException("Validations cannot be null: " + exceptionEnd);
         }
 
         this.name = this.id + ". " + this.name;
     }
 
 
-    private String exceptionEnd() {
-        return "Error en la pregunta: " + name + ", id: " + id + ". ";
-    }
-
     public void validateAnswer(Answer object) {
+
+        if (!id.equals(object.getQuestionId())) {
+            throw new IllegalArgumentException("Answer question id does not match question id " + id);
+        }
 
         Set<ConstraintViolation<Answer>> violations = new HashSet<>();
         for (var validation : validations) {
@@ -115,19 +115,21 @@ public class Question {
                         return name;
                     }
                 };
-                violations.add(ConstraintViolationImpl.forParameterValidation(null, null, null, errorMessage, null, null, null, object.getValue(), propertyPath , null, null, null));
+                violations.add(ConstraintViolationImpl.forParameterValidation(null, null, null, errorMessage, null, null, null, object.getValue(), propertyPath, null, null, null));
             }
 
         }
 
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
+        if (!violations.isEmpty()) throw new ConstraintViolationException(violations);
+
     }
 
-    public enum QuestionType {
-        TEXT, SELECT, RADIO, CHECKBOX, NUMBER, LOCATION, TEL, CUSTOM
-
+    public static Question findQuestionById(Long questionId, List<Question> questions) {
+        return questions
+                .stream()
+                .filter(question -> question.getId().equals(questionId))
+                .findFirst()
+                .orElseThrow();
     }
 
 }

@@ -41,6 +41,13 @@ public class DiskSFileStoreService implements FileStoreService {
 
     }
 
+    public String storeInFolder(InputStream upload, String filename, String folder) throws IOException {
+        if (folder.charAt(0) == '/') folder = folder.substring(1);
+        var p = storagePath + "/" + folder + "/" + UUID.randomUUID() + getExtension(filename);
+        return internalStore(upload, p);
+
+    }
+
     @Override
     public String storeEphimeral(InputStream upload, String filename) throws IOException {
         var path = storagePath + "/ephimeral/" + UUID.randomUUID() + getExtension(filename);
