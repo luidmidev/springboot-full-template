@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface QValidator extends Function<Answer, String> {
+import static com.luidmidev.template.spring.services.quizz.validations.QValidationResult.*;
+
+public interface QValidator extends Function<Answer, QValidationResult> {
 
     @Override
-    String apply(Answer answer);
+    QValidationResult apply(Answer answer);
 
     String INITIAL_MESSAGE = "La respuesta de la pregunta ";
 
@@ -41,18 +43,18 @@ public interface QValidator extends Function<Answer, String> {
         return answer -> {
 
             if (answer.getValue() == null) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " es requerida";
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " es requerida");
             }
 
             if (listOperation(answer.getValue(), List::isEmpty)) {
-                return "Debe seleccionar al menos una opción en la pregunta " + answer.getQuestionId();
+                return invalid("Debe seleccionar al menos una opción en la pregunta " + answer.getQuestionId());
             }
 
             if (stringOperation(answer.getValue(), String::isEmpty)) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " no puede estar vacía";
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " no puede estar vacía");
             }
 
-            return null;
+            return valid();
 
         };
     }
@@ -61,9 +63,9 @@ public interface QValidator extends Function<Answer, String> {
 
         return answer -> {
             if (stringOperation(answer.getValue(), value -> value.length() > length)) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " no puede tener más de " + length + " caracteres";
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " no puede tener más de " + length + " caracteres");
             }
-            return null;
+            return valid();
         };
     }
 
@@ -72,9 +74,9 @@ public interface QValidator extends Function<Answer, String> {
 
         return answer -> {
             if (stringOperation(answer.getValue(), value -> value.length() < length)) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " no puede tener menos de " + length + " caracteres";
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " no puede tener menos de " + length + " caracteres");
             }
-            return null;
+            return valid();
         };
 
     }
@@ -83,9 +85,9 @@ public interface QValidator extends Function<Answer, String> {
     static QValidator email() {
         return answer -> {
             if (stringOperation(answer.getValue(), value -> value.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$"))) {
-                return null;
+                return valid();
             }
-            return INITIAL_MESSAGE + answer.getQuestionId() + " debe ser un correo electrónico válido";
+            return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " debe ser un correo electrónico válido");
         };
     }
 
@@ -94,10 +96,10 @@ public interface QValidator extends Function<Answer, String> {
 
         return answer -> {
             if (isNotNumber(answer.getValue())) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " debe ser un número";
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " debe ser un número");
             }
 
-            return null;
+            return valid();
         };
     }
 
@@ -105,10 +107,10 @@ public interface QValidator extends Function<Answer, String> {
 
         return answer -> {
             if (!existsValue(answer) || stringOperation(answer.getValue(), value -> !CiConstraintValidator.validateCi(value))) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " no es un número de cédula válido";
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " no es un número de cédula válido");
             }
 
-            return null;
+            return valid();
         };
 
     }
@@ -116,9 +118,9 @@ public interface QValidator extends Function<Answer, String> {
     static QValidator isPositive() {
         return answer -> {
             if (isNotNumber(answer.getValue()) || numberOperation(answer.getValue(), number -> number.intValue() <= 0)) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " debe ser mayor a 0";
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " debe ser mayor a 0");
             }
-            return null;
+            return valid();
         };
 
     }
@@ -126,81 +128,81 @@ public interface QValidator extends Function<Answer, String> {
     static QValidator isNegative() {
         return answer -> {
             if (isNotNumber(answer.getValue()) || numberOperation(answer.getValue(), number -> number.intValue() >= 0)) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " debe ser menor a 0";
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " debe ser menor a 0");
             }
-            return null;
+            return valid();
         };
     }
 
     static QValidator isPositiveOrZero() {
         return answer -> {
             if (isNotNumber(answer.getValue()) || numberOperation(answer.getValue(), number -> number.intValue() < 0)) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " debe ser mayor o igual a 0";
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " debe ser mayor o igual a 0");
             }
-            return null;
+            return valid();
         };
     }
 
     static QValidator isNegativeOrZero() {
         return answer -> {
             if (isNotNumber(answer.getValue()) || numberOperation(answer.getValue(), number -> number.intValue() <= 0)) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " debe ser menor o igual a 0";
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " debe ser menor o igual a 0");
             }
-            return null;
+            return valid();
         };
     }
 
     static QValidator greaterThan(int min) {
         return answer -> {
             if (isNotNumber(answer.getValue()) || numberOperation(answer.getValue(), number -> number.intValue() <= min)) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " debe ser mayor a " + min;
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " debe ser mayor a " + min);
             }
-            return null;
+            return valid();
         };
     }
 
     static QValidator lessThan(int max) {
         return answer -> {
             if (isNotNumber(answer.getValue()) || numberOperation(answer.getValue(), number -> number.intValue() >= max)) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " debe ser menor a " + max;
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " debe ser menor a " + max);
             }
-            return null;
+            return valid();
         };
     }
 
     static QValidator greaterThanOrEqual(int min) {
         return answer -> {
             if (isNotNumber(answer.getValue()) || numberOperation(answer.getValue(), number -> number.intValue() < min)) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " debe ser mayor o igual a " + min;
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " debe ser mayor o igual a " + min);
             }
-            return null;
+            return valid();
         };
     }
 
     static QValidator lessThanOrEqual(int max) {
         return answer -> {
             if (isNotNumber(answer.getValue()) || numberOperation(answer.getValue(), number -> number.intValue() > max)) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " debe ser menor o igual a " + max;
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " debe ser menor o igual a " + max);
             }
-            return null;
+            return valid();
         };
     }
 
     static QValidator inRange(int min, int max) {
         return answer -> {
             if (isNotNumber(answer.getValue()) || numberOperation(answer.getValue(), number -> number.intValue() < min || number.intValue() > max)) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " debe estar entre " + min + " y " + max;
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " debe estar entre " + min + " y " + max);
             }
-            return null;
+            return valid();
         };
     }
 
     static QValidator inList(List<?> list) {
         return answer -> {
             if (listOperation(answer.getValue(), value -> list.stream().anyMatch(value::contains))) {
-                return INITIAL_MESSAGE + answer.getQuestionId() + " debe ser una de las opciones: " + list;
+                return invalid(INITIAL_MESSAGE + answer.getQuestionId() + " debe ser una de las opciones: " + list);
             }
-            return null;
+            return valid();
         };
     }
 
@@ -233,7 +235,7 @@ public interface QValidator extends Function<Answer, String> {
     }
 
     static boolean existsValue(Answer value) {
-        return required().apply(value) == null;
+        return required().apply(value).isValid();
     }
 
 }

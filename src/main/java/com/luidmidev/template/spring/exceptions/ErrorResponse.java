@@ -1,5 +1,7 @@
 package com.luidmidev.template.spring.exceptions;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -16,6 +18,8 @@ public class ErrorResponse {
 
     public String message;
     public Integer status;
+
+    @JsonInclude(Include.NON_NULL)
     public Object target;
 
     /**

@@ -3,18 +3,20 @@ package com.luidmidev.template.spring.services.quizz.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.luidmidev.template.spring.exceptions.ClientException;
 import com.luidmidev.template.spring.services.quizz.QuestionType;
+import com.luidmidev.template.spring.services.quizz.validations.InvalidAnswer;
+import com.luidmidev.template.spring.services.quizz.validations.QValidationInvalidAnswerException;
+import com.luidmidev.template.spring.services.quizz.validations.QValidationResult;
 import com.luidmidev.template.spring.services.quizz.validations.QValidator;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Path;
 import lombok.Data;
-import lombok.NonNull;
-import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
-//
+
 import static com.luidmidev.template.spring.services.quizz.QuestionType.*;
 
 
@@ -33,7 +35,7 @@ public class Question {
     @JsonInclude(Include.NON_NULL)
     private Boolean otherOption;
 
-    private List<? extends Function<Answer, String>> validations;
+    private List<? extends Function<Answer, QValidationResult>> validations;
 
     private String exceptionEnd = "Error en la pregunta: " + name + ", id: " + id + ". ";
 
@@ -95,41 +97,18 @@ public class Question {
     public void validateAnswer(Answer object) {
 
         if (!id.equals(object.getQuestionId())) {
-            throw new IllegalArgumentException("Answer question id does not match question id " + id);
+            throw new ClientException("Answer question id does not match question id " + id);
         }
 
-        Set<ConstraintViolation<Answer>> violations = new HashSet<>();
+        var invalids = new ArrayList<InvalidAnswer>();
         for (var validation : validations) {
-            var errorMessage = validation.apply(object);
-            if (errorMessage != null) {
-                Path propertyPath = new Path() {
+            var result = validation.apply(object);
 
-                    @NonNull
-                    @Override
-                    public Iterator<Node> iterator() {
-                        return Collections.emptyIterator();
-                    }
-
-                    @Override
-                    public String toString() {
-                        return name;
-                    }
-                };
-                violations.add(ConstraintViolationImpl.forParameterValidation(null, null, null, errorMessage, null, null, null, object.getValue(), propertyPath, null, null, null));
-            }
-
+            if (result.isInvalid()) invalids.add(new InvalidAnswer(id, result.getMessage()));
         }
 
-        if (!violations.isEmpty()) throw new ConstraintViolationException(violations);
+        if (!invalids.isEmpty()) throw new QValidationInvalidAnswerException(invalids);
 
-    }
-
-    public static Question findQuestionById(Long questionId, List<Question> questions) {
-        return questions
-                .stream()
-                .filter(question -> question.getId().equals(questionId))
-                .findFirst()
-                .orElseThrow();
     }
 
 }
