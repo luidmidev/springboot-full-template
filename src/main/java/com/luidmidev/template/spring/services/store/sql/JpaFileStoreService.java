@@ -74,11 +74,13 @@ public class JpaFileStoreService implements FileStoreService {
         var dbFile = repository.findById(uuid).orElseThrow(this::notFoundFileException);
 
         var loadFile = DownloadedFile.builder()
-                .filename(dbFile.getOriginalFileName())
-                .fileType(dbFile.getContentType())
-                .fileSize(dbFile.getContentLength())
                 .file(dbFile.getContent())
-                .build();
+                .info(FileInfo.builder()
+                        .filename(dbFile.getOriginalFileName())
+                        .fileType(dbFile.getContentType())
+                        .fileSize(dbFile.getContentLength())
+                        .build()
+                ).build();
 
         if (dbFile.getEphimeral()) repository.delete(dbFile);
 

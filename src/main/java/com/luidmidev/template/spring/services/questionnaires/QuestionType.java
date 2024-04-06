@@ -1,4 +1,4 @@
-package com.luidmidev.template.spring.services.quizz;
+package com.luidmidev.template.spring.services.questionnaires;
 
 public enum QuestionType {
     TEXT,

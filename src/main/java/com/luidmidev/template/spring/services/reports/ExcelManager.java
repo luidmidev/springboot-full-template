@@ -22,6 +22,14 @@ public class ExcelManager implements Closeable {
 
     protected XSSFFormulaEvaluator evaluator;
 
+
+    /**
+     * Constructor para crear un objeto ExcelModel a partir de un nuevo archivo de Excel.
+     */
+    public ExcelManager() {
+        this(new XSSFWorkbook());
+    }
+
     /**
      * Constructor para crear un objeto ExcelModel a partir de una ruta de archivo.
      *
@@ -151,8 +159,7 @@ public class ExcelManager implements Closeable {
 
     public XSSFCell getCellFromIndex(int sheetIndex, int rowIndex, int cellIndex) throws Exception {
         XSSFSheet sxxfSheet = workbook.getSheetAt(sheetIndex);
-        if (sxxfSheet == null)
-            throw new Exception("No existe la hoja de calculo con indice " + sheetIndex);
+        if (sxxfSheet == null) throw new Exception("No existe la hoja de calculo con indice " + sheetIndex);
 
         XSSFRow row = sxxfSheet.getRow(rowIndex);
         return row.getCell(cellIndex);
@@ -160,11 +167,9 @@ public class ExcelManager implements Closeable {
 
     public XSSFCell getCellFromIndex(String sheetName, int rowIndex, int cellIndex) throws Exception {
         XSSFSheet sxxfSheet = workbook.getSheet(sheetName);
-        if (sxxfSheet == null)
-            throw new Exception("No existe la hoja de calculo con nombre " + sheetName);
+        if (sxxfSheet == null) throw new Exception("No existe la hoja de calculo con nombre " + sheetName);
         //verificar que la fila exista
-        if (sxxfSheet.getRow(rowIndex) == null)
-            sxxfSheet.createRow(rowIndex);
+        if (sxxfSheet.getRow(rowIndex) == null) sxxfSheet.createRow(rowIndex);
 
         XSSFRow row = sxxfSheet.getRow(rowIndex);
         return row.getCell(cellIndex);
@@ -214,8 +219,7 @@ public class ExcelManager implements Closeable {
      */
     public String getValueCellFromName(String name) throws Exception {
         String[] title = getValuesCellsFromName(name);
-        if (title.length > 1)
-            throw new Exception("El nombre " + name + " debe hacer referencia a una unica celda");
+        if (title.length > 1) throw new Exception("El nombre " + name + " debe hacer referencia a una unica celda");
         return title[0];
     }
 

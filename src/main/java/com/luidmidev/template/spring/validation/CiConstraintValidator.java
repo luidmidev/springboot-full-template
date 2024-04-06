@@ -15,24 +15,21 @@ public class CiConstraintValidator implements ConstraintValidator<Ci, String> {
     }
 
     @Override
-    public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(String s, ConstraintValidatorContext context) {
 
         if (nullable) {
             if (s == null) return true;
             if (s.isEmpty()) return true;
         }
 
-        if (validateCi(s)) {
-            return true;
-        }
+        if (validate(s)) return true;
 
-
-        constraintValidatorContext.disableDefaultConstraintViolation();
-        constraintValidatorContext.buildConstraintViolationWithTemplate("Cédula inválida").addConstraintViolation();
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate("Cédula inválida").addConstraintViolation();
         return false;
     }
 
-    public static boolean validateCi(String cedulaString) {
+    public static boolean validate(String cedulaString) {
 
         try {
             if (cedulaString == null) return false;

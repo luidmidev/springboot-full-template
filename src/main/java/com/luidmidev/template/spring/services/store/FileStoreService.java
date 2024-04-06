@@ -34,23 +34,15 @@ public interface FileStoreService {
     }
 
 
-    @EqualsAndHashCode(callSuper = true)
-    @NoArgsConstructor
     @Data
-    class DownloadedFile extends FileInfo {
+    @Builder
+    class DownloadedFile {
         private byte[] file;
-
-        @Builder
-        public DownloadedFile(String filename, String fileType, Long fileSize, byte[] file) {
-            super(filename, fileType, fileSize);
-            this.file = file;
-        }
+        private FileInfo info;
     }
 
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
     @Data
+    @Builder
     class FileInfo {
         private String filename;
         private String fileType;

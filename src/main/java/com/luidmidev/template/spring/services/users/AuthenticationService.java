@@ -56,18 +56,21 @@ public class AuthenticationService {
         }
 
         var admin = User.builder()
-                .username("admin")
+                .username("admin159")
                 .password(encoder.encode("Qwerty1598."))
                 .name("Administrador")
                 .lastname("Administrador")
                 .email("playerluis159@gmail.com")
                 .enabled(true)
                 .role("ADMIN")
+                .cedula("2300826357")
                 .build();
 
-        logger.info("Creando usuario administrador, sus credenciales son: {} - {}", admin.getUsername(), admin.getPassword());
-        emailSenderService.sendSimpleMail(admin.getEmail(), "Se acaba de reiniciar el servidor", "Se acaba de reiniciar el servidor, sus credenciales del usuario administrador son: " + admin.getUsername() + " - " + admin.getPassword());
-        userRepository.save(admin);
+        if (!userRepository.existsByUsername(admin.getUsername())) {
+            logger.info("Creando usuario administrador, sus credenciales son: {} - {}", admin.getUsername(), admin.getPassword());
+            emailSenderService.sendSimpleMail(admin.getEmail(), "Se acaba de reiniciar el servidor", "Se acaba de reiniciar el servidor, sus credenciales del usuario administrador son: " + admin.getUsername() + " - " + admin.getPassword());
+            userRepository.save(admin);
+        }
     }
 
     public String authenticate(Login login) {

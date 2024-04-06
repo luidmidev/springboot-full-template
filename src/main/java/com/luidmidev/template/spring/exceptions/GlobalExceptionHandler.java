@@ -1,6 +1,6 @@
 package com.luidmidev.template.spring.exceptions;
 
-import com.luidmidev.template.spring.services.quizz.validations.QValidationInvalidAnswerException;
+import com.luidmidev.template.spring.services.questionnaires.exception.InvalidAnswersException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -111,8 +111,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(ErrorResponse.of("Error al escribir la respuesta"));
     }
 
-    @ExceptionHandler(QValidationInvalidAnswerException.class)
-    public ResponseEntity<List<ErrorResponse>> handleQValidationInvalidAnswerException(QValidationInvalidAnswerException ex) {
+    @ExceptionHandler(InvalidAnswersException.class)
+    public ResponseEntity<List<ErrorResponse>> handleQValidationInvalidAnswerException(InvalidAnswersException ex) {
         List<ErrorResponse> errors = ex
                 .getInvalidAnswers()
                 .stream()

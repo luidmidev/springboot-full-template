@@ -1,10 +1,10 @@
-package com.luidmidev.template.spring.services.quizz.validations;
+package com.luidmidev.template.spring.services.questionnaires.validations;
 
 
 import lombok.Getter;
 
 @Getter
-public final class QValidationResult {
+public class QValidationResult {
     private final boolean valid;
     private final String message;
 

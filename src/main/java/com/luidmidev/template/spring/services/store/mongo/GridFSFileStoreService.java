@@ -3,9 +3,7 @@ package com.luidmidev.template.spring.services.store.mongo;
 import com.luidmidev.template.spring.services.store.FileStoreService;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import com.mongodb.client.gridfs.model.GridFSFile;
 import org.apache.commons.io.IOUtils;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,51 +72,52 @@ public class GridFSFileStoreService implements FileStoreService {
 
     public DownloadedFile download(String id) throws IOException {
 
-        GridFSFile gridFSFile = template.findOne(new Query(Criteria.where("_id").is(id)));
-        DownloadedFile loadFile = new DownloadedFile();
+        var gridFSFile = template.findOne(new Query(Criteria.where("_id").is(id)));
+        var loadFileBuilder = DownloadedFile.builder();
 
         if (gridFSFile == null) return null;
 
         if (gridFSFile.getMetadata() != null) {
 
-            Document metadata = gridFSFile.getMetadata();
+            var metadata = gridFSFile.getMetadata();
 
-            loadFile.setFilename(gridFSFile.getFilename());
-            loadFile.setFileType(metadata.get("_contentType").toString());
-            loadFile.setFileSize(Long.parseLong(metadata.get("fileSize").toString()));
-            loadFile.setFile(IOUtils.toByteArray(operations.getResource(gridFSFile).getInputStream()));
+            var fileInfo = FileInfo.builder()
+                    .filename(gridFSFile.getFilename())
+                    .fileType(metadata.get("_contentType").toString())
+                    .fileSize(Long.parseLong(metadata.get("fileSize").toString()))
+                    .build();
 
+            loadFileBuilder.file(IOUtils.toByteArray(operations.getResource(gridFSFile).getInputStream()));
+            loadFileBuilder.info(fileInfo);
 
             if (metadata.containsKey("ephimeral") && metadata.getBoolean("ephimeral")) {
-                logger.info("Downloading and removing ephimeral file '{}'", loadFile.getFilename());
                 remove(id);
-            } else {
-                logger.info("Downloading file '{}'", loadFile.getFilename());
             }
         }
 
-        return loadFile;
+        return loadFileBuilder.build();
     }
 
     @Override
     public FileInfo info(String id) {
 
-        GridFSFile gridFSFile = template.findOne(new Query(Criteria.where("_id").is(id)));
-        FileInfo fileInfo = new FileInfo();
+        var gridFSFile = template.findOne(new Query(Criteria.where("_id").is(id)));
+        var builder = FileInfo.builder();
 
         if (gridFSFile == null) return null;
 
         if (gridFSFile.getMetadata() != null) {
 
-            Document metadata = gridFSFile.getMetadata();
+            var metadata = gridFSFile.getMetadata();
 
-            fileInfo.setFilename(gridFSFile.getFilename());
-            fileInfo.setFileType(metadata.get("_contentType").toString());
-            fileInfo.setFileSize(Long.parseLong(metadata.get("fileSize").toString()));
+            builder
+                    .filename(gridFSFile.getFilename())
+                    .fileType(metadata.get("_contentType").toString())
+                    .fileSize(Long.parseLong(metadata.get("fileSize").toString()));
 
         }
 
-        return fileInfo;
+        return builder.build();
 
     }
 

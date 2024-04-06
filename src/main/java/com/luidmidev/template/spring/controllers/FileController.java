@@ -46,11 +46,12 @@ public class FileController {
 
         var isInline = inline != null && inline.equals("true");
 
-        var filename = StringUtils.normalice(loadFile.getFilename());
+        var fileInfo = loadFile.getInfo();
+        var filename = StringUtils.normalice(fileInfo.getFilename());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .contentType(MediaType.parseMediaType(loadFile.getFileType()))
+                .contentType(MediaType.parseMediaType(fileInfo.getFileType()))
                 .headers(getHeaders(filename, isInline))
                 .body(new ByteArrayResource(loadFile.getFile()));
     }

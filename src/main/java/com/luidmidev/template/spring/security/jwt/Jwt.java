@@ -2,6 +2,7 @@ package com.luidmidev.template.spring.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -37,9 +38,16 @@ public class Jwt {
     @Value("${security.jwt.ttlMillis}")
     private long ttlMillis;
 
-    private final SecretKey signingKey = getSigningKey();
+    private SecretKey signingKey;
+
+    @PostConstruct
+    private void init() {
+        signingKey = getSigningKey();
+    }
+
 
     private SecretKey getSigningKey() {
+        log.info("Creating signing key with secret '{}'", key);
         var apiKeySecretBytes = DatatypeConverter.parseBase64Binary(key); // Clave secreta en bytes
         return new SecretKeySpec(apiKeySecretBytes, "HmacSHA256"); // Clave secreta para firmar el token
     }

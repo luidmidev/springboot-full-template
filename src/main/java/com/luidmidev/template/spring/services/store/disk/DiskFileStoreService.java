@@ -12,10 +12,10 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 @Service
-public class DiskSFileStoreService implements FileStoreService {
+public class DiskFileStoreService implements FileStoreService {
     private final String storagePath;
 
-    public DiskSFileStoreService(@Value("${filestorage.path}") String storagePath) {
+    public DiskFileStoreService(@Value("${filestorage.path}") String storagePath) {
         if (storagePath.contains("{user.dir}")) {
             this.storagePath = storagePath.replace("{user.dir}", System.getProperty("user.dir"));
         } else {
@@ -67,11 +67,13 @@ public class DiskSFileStoreService implements FileStoreService {
         var filename = file.getName();
 
         return DownloadedFile.builder()
-                .filename(filename)
-                .fileType(guessContentType(filename))
-                .fileSize(file.length())
                 .file(bytes)
-                .build();
+                .info(FileInfo.builder()
+                        .filename(filename)
+                        .fileType(guessContentType(filename))
+                        .fileSize(file.length())
+                        .build()
+                ).build();
 
     }
 
