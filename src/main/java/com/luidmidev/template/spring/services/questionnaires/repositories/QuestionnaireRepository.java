@@ -4,4 +4,10 @@ import com.luidmidev.template.spring.services.questionnaires.models.Questionnair
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface QuestionnaireRepository extends MongoRepository<Questionnaire, String> {
+    boolean existsByIdAndAnswersIsNotEmpty(String id);
+
+    default boolean questionaireHasAnswers(String id) {
+        return existsByIdAndAnswersIsNotEmpty(id);
+    }
+
 }

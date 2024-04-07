@@ -56,9 +56,6 @@ public class QuestionnaireMongoEventListenner extends AbstractMongoEventListener
                 }
             }
         }
-
-        log.info("Before save document before: {}", document);
-        log.info("Before save questionnaire before: {}", questionnaireSource);
     }
 
     @Override

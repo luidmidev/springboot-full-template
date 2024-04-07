@@ -10,7 +10,7 @@ public class QValidation {
     private Object[] args;
 
     public static QValidation of(QValidator validator) {
-        return QValidation.builder()
+        return builder()
                 .name(validator.getValidatorName())
                 .args(validator.getArgs())
                 .build();

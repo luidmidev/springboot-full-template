@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.util.Collection;
 
 @Getter
-public class InvalidAnswersException extends RuntimeException {
+public class InvalidAnswersException extends Exception {
     private final Collection<InvalidAnswer> invalidAnswers;
 
     public InvalidAnswersException(Collection<InvalidAnswer> invalidAnswers) {

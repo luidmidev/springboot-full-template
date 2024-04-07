@@ -281,12 +281,8 @@ public interface QValidator extends Function<Answer, QValidationResult> {
     }
 
     private static int getNumber(Object value) {
-        if (value instanceof Number number) {
-            return number.intValue();
-        }
-        if (value instanceof String stringValue && stringValue.matches("\\d+")) {
-            return Integer.parseInt(stringValue);
-        }
+        if (value instanceof Number number) return number.intValue();
+        if (value instanceof String stringValue && stringValue.matches("\\d+")) return Integer.parseInt(stringValue);
         throw new IllegalArgumentException("Value is not a number");
     }
 

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.luidmidev.template.spring.exceptions.ClientException;
 import com.luidmidev.template.spring.services.questionnaires.QuestionType;
 import com.luidmidev.template.spring.services.questionnaires.exception.InvalidAnswer;
-import com.luidmidev.template.spring.services.questionnaires.exception.InvalidAnswersException;
 import com.luidmidev.template.spring.services.questionnaires.validations.QValidation;
 import com.luidmidev.template.spring.services.questionnaires.validations.QValidator;
 import lombok.Data;
@@ -14,10 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.annotation.Transient;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static com.luidmidev.template.spring.services.questionnaires.QuestionType.*;
 import static java.util.Collections.emptyList;
@@ -30,15 +26,11 @@ public class Question {
     private Long number;
     private String name;
     private QuestionType type;
-
     @JsonInclude(Include.NON_EMPTY)
     private List<String> options;
-
     @JsonInclude(Include.NON_NULL)
     private Boolean otherOption;
-
     private List<QValidation> validations;
-
     @Transient
     private List<QValidator> validators;
 
@@ -105,7 +97,7 @@ public class Question {
         this.validations = Arrays.stream(validators).map(QValidation::of).toList();
     }
 
-    public void validateAnswer(Answer object) {
+    public Collection<InvalidAnswer> validateAnswer(Answer object) {
 
         if (!number.equals(object.getQuestionNumber())) {
             throw new ClientException("Answer question id does not match question id " + number);
@@ -119,7 +111,7 @@ public class Question {
             }
         }
 
-        if (!invalids.isEmpty()) throw new InvalidAnswersException(invalids);
+        return invalids;
     }
 
     public void loadValidators() {
