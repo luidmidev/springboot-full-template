@@ -1,16 +1,19 @@
-package com.luidmidev.template.spring.services.users;
+package com.luidmidev.template.spring.services;
 
 
 import com.luidmidev.template.spring.dto.Login;
 import com.luidmidev.template.spring.dto.RecoveryPasswordData;
 import com.luidmidev.template.spring.exceptions.ClientException;
+import com.luidmidev.template.spring.models.Role;
 import com.luidmidev.template.spring.models.TokenForgetPassword;
 import com.luidmidev.template.spring.models.User;
+import com.luidmidev.template.spring.repositories.RoleRepository;
 import com.luidmidev.template.spring.repositories.TokenForgetPasswordRepository;
 import com.luidmidev.template.spring.repositories.UserRepository;
 import com.luidmidev.template.spring.security.Argon2CustomPasswordEncoder;
 import com.luidmidev.template.spring.security.jwt.Jwt;
 import com.luidmidev.template.spring.services.emails.EmailSenderService;
+import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,7 @@ import java.util.Random;
 
 @Service
 @Transactional
+@Log4j2
 public class AuthenticationService {
 
     private final UserRepository userRepository;
@@ -34,10 +38,8 @@ public class AuthenticationService {
     private final Jwt jwt;
 
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
-
     @Autowired
-    public AuthenticationService(UserRepository userRepository, TokenForgetPasswordRepository forgetPasswordRepository, EmailSenderService emailSenderService, Jwt jwt, AuthenticationManager authenticationManager, SessionAuditService sessionAuditService, Argon2CustomPasswordEncoder encoder) {
+    public AuthenticationService(UserRepository userRepository, RoleRepository roleRepository, TokenForgetPasswordRepository forgetPasswordRepository, EmailSenderService emailSenderService, Jwt jwt, AuthenticationManager authenticationManager, SessionAuditService sessionAuditService, Argon2CustomPasswordEncoder encoder) {
 
         this.userRepository = userRepository;
         this.forgetPasswordRepository = forgetPasswordRepository;
@@ -51,9 +53,26 @@ public class AuthenticationService {
 
 
         if (userRepository.existsByUsername("admin")) {
-            logger.info("Ya existe un usuario administrador en el sistema, omitiendo creación");
+            log.info("Ya existe un usuario administrador en el sistema, omitiendo creación");
             return;
         }
+
+        var adminRole = roleRepository.findByName("ADMIN").orElseGet(() -> {
+            var role = Role.builder()
+                    .name("ADMIN")
+                    .description("Rol de administrador")
+                    .build();
+            return roleRepository.save(role);
+        });
+
+        roleRepository.findByName("USER").orElseGet(() -> {
+            var role = Role.builder()
+                    .name("USER")
+                    .description("Rol de usuario")
+                    .build();
+            return roleRepository.save(role);
+        });
+
 
         var admin = User.builder()
                 .username("admin159")
@@ -62,12 +81,15 @@ public class AuthenticationService {
                 .lastname("Administrador")
                 .email("playerluis159@gmail.com")
                 .enabled(true)
-                .role("ADMIN")
+                .accountNonExpired(true)
+                .accountNonLocked(true)
+                .credentialsNonExpired(true)
+                .role(adminRole)
                 .cedula("2300826357")
                 .build();
 
         if (!userRepository.existsByUsername(admin.getUsername())) {
-            logger.info("Creando usuario administrador, sus credenciales son: {} - {}", admin.getUsername(), admin.getPassword());
+            log.info("Creando usuario administrador, sus credenciales son: {} - {}", admin.getUsername(), admin.getPassword());
             emailSenderService.sendSimpleMail(admin.getEmail(), "Se acaba de reiniciar el servidor", "Se acaba de reiniciar el servidor, sus credenciales del usuario administrador son: " + admin.getUsername() + " - " + admin.getPassword());
             userRepository.save(admin);
         }

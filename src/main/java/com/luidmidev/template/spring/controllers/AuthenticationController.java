@@ -4,9 +4,10 @@ import com.luidmidev.template.spring.dto.Login;
 import com.luidmidev.template.spring.dto.RecoveryPasswordData;
 import com.luidmidev.template.spring.dto.Register;
 import com.luidmidev.template.spring.models.User;
-import com.luidmidev.template.spring.services.users.AuthenticationService;
-import com.luidmidev.template.spring.services.users.UserService;
+import com.luidmidev.template.spring.services.AuthenticationService;
+import com.luidmidev.template.spring.services.UserService;
 import jakarta.validation.Valid;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Controlador para la autenticación y gestión de usuarios.
  */
+@Log4j2
 @Validated
 @RestController
 public class AuthenticationController {

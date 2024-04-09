@@ -33,10 +33,6 @@ public class User implements UserDetails {
 
     @NotBlank
     @Size(max = 100)
-    private String role;
-
-    @NotBlank
-    @Size(max = 100)
     private String name;
 
     @NotBlank
@@ -58,29 +54,24 @@ public class User implements UserDetails {
 
     private boolean enabled;
 
+    private boolean accountNonExpired;
+
+    private boolean accountNonLocked;
+
+    private boolean credentialsNonExpired;
+
     @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<SessionAudit> sessionAudits;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Role role;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(() -> role);
+        return Collections.singletonList(() -> role.getName());
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
 
     public void hidePassword() {
         this.password = null;

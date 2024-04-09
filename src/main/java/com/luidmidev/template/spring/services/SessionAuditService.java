@@ -1,4 +1,4 @@
-package com.luidmidev.template.spring.services.users;
+package com.luidmidev.template.spring.services;
 
 
 import com.luidmidev.template.spring.models.SessionAudit;

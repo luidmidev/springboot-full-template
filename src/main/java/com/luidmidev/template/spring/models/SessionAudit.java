@@ -13,13 +13,13 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "session_audit")
+
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-@Log4j2
+@Entity
+@Table(name = "session_audit")
 public class SessionAudit {
 
     @Id
@@ -44,6 +44,5 @@ public class SessionAudit {
         assert request != null;
         setIp(request.getRequest().getRemoteAddr());
         setDatetime(LocalDateTime.now());
-        log.info("SessionAuditListener.onBeforeConvert: {}", this);
     }
 }

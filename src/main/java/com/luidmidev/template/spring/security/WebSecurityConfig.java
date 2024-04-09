@@ -3,7 +3,7 @@ package com.luidmidev.template.spring.security;
 
 import com.luidmidev.template.spring.exceptions.ErrorResponse;
 import com.luidmidev.template.spring.security.filters.JwtOncePerRequestFilter;
-import com.luidmidev.template.spring.services.users.UserService;
+import com.luidmidev.template.spring.services.UserService;
 import com.luidmidev.template.spring.utils.EnvironmentChecker;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;

@@ -2,10 +2,9 @@ package com.luidmidev.template.spring.controllers;
 
 
 import com.luidmidev.template.spring.exceptions.ClientException;
-import com.luidmidev.template.spring.services.store.FileStoreService;
-import com.luidmidev.template.spring.services.store.FileStoreService.FileInfo;
-import com.luidmidev.template.spring.services.store.mongo.GridFSFileStoreService;
 import com.luidmidev.template.spring.utils.StringUtils;
+import com.waipersoft.store.FileStoreService;
+import com.waipersoft.store.targets.mongo.GridFSFileStoreService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import static com.luidmidev.template.spring.services.store.FileStoreUtils.getHeaders;
+import static com.waipersoft.store.FileStoreUtils.getHeaders;
 
 
 @RestController
@@ -78,7 +77,7 @@ public class FileController {
     }
 
     @GetMapping("/info/{id}")
-    public ResponseEntity<FileInfo> info(@PathVariable String id) throws IOException {
+    public ResponseEntity<FileStoreService.FileInfo> info(@PathVariable String id) throws IOException {
         var loadFile = fileStoreService.info(id);
         return ResponseEntity.ok(loadFile);
     }

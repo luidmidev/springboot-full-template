@@ -1,15 +1,16 @@
-package com.luidmidev.template.spring.services.users;
+package com.luidmidev.template.spring.services;
 
 
 import com.luidmidev.template.spring.dto.Register;
 import com.luidmidev.template.spring.dto.UpdateUser;
 import com.luidmidev.template.spring.exceptions.ClientException;
+import com.luidmidev.template.spring.models.Role;
 import com.luidmidev.template.spring.models.User;
+import com.luidmidev.template.spring.repositories.RoleRepository;
 import com.luidmidev.template.spring.repositories.UserRepository;
 import com.luidmidev.template.spring.security.Argon2CustomPasswordEncoder;
 import com.luidmidev.template.spring.security.jwt.Jwt;
 import com.luidmidev.template.spring.services.emails.EmailSenderService;
-import com.luidmidev.template.spring.services.users.SessionAuditService;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -30,16 +32,16 @@ import java.util.Optional;
 @Validated
 public class UserService implements UserDetailsService {
 
-    static final String[] ROLES = {"ADMIN", "USER"};
-
     private final UserRepository repository;
+    private final RoleRepository roleRepository;
     private final EmailSenderService emailSenderService;
     private final Argon2CustomPasswordEncoder encoder;
     private final SessionAuditService sessionAuditService;
     private final Jwt jwtutil;
 
-    UserService(UserRepository repository, EmailSenderService emailSenderService, Argon2CustomPasswordEncoder encoder, SessionAuditService sessionAuditService, Jwt jwtUtil) {
+    UserService(UserRepository repository, RoleRepository roleRepository, EmailSenderService emailSenderService, Argon2CustomPasswordEncoder encoder, SessionAuditService sessionAuditService, Jwt jwtUtil) {
         this.repository = repository;
+        this.roleRepository = roleRepository;
         this.emailSenderService = emailSenderService;
         this.encoder = encoder;
         this.sessionAuditService = sessionAuditService;
@@ -77,8 +79,10 @@ public class UserService implements UserDetailsService {
             throw new ClientException("No se ha enviado ningún dato para actualizar");
         }
 
-        System.out.println(detailsUser);
-        if (role != null && !Arrays.asList(ROLES).contains(role)) {
+
+        var selectedRole = roleRepository.findByName(role);
+
+        if (selectedRole.isEmpty()) {
             throw new ClientException("El rol que se trata de asignar no existe en el sistema");
         }
 
@@ -86,7 +90,7 @@ public class UserService implements UserDetailsService {
         var user = repository.findById(id).orElseThrow(() -> new ClientException("El usuario no existe"));
 
         if (enabled != null) user.setEnabled(enabled);
-        if (role != null) user.setRole(role);
+        if (role != null) user.setRole(selectedRole.get());
         if (password != null && !password.isBlank()) user.setPassword(encoder.encode(password));
 
 
@@ -114,6 +118,8 @@ public class UserService implements UserDetailsService {
             throw new ClientException("El email ingresado ya está registrado");
         }
 
+        var userRole = roleRepository.findByName("USER").orElseThrow(() -> new ClientException("No se ha encontrado el rol de usuario"));
+
         var user = User.builder()
                 .username(register.getUsername())
                 .password(encoder.encode(register.getPassword()))
@@ -121,7 +127,7 @@ public class UserService implements UserDetailsService {
                 .lastname(register.getLastname())
                 .email(register.getEmail().trim())
                 .enabled(true)
-                .role("USER")
+                .role(userRole)
                 .build();
 
 

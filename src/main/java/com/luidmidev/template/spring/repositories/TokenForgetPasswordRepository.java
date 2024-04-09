@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.Optional;
 
 public interface TokenForgetPasswordRepository extends JpaRepository<TokenForgetPassword, String> {
-    Logger logger = LoggerFactory.getLogger(TokenForgetPasswordRepository.class);
 
     Optional<TokenForgetPassword> findByToken(String token);
 
@@ -17,7 +16,6 @@ public interface TokenForgetPasswordRepository extends JpaRepository<TokenForget
         var tokens = findAll();
         var expired = tokens.stream().filter(TokenForgetPassword::isExpired).toList();
         deleteAll(expired);
-        logger.info("Has been deleted {} expired tokens", expired.size());
     }
 }
 

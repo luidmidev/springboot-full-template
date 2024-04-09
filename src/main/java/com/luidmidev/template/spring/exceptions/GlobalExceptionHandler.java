@@ -1,6 +1,6 @@
 package com.luidmidev.template.spring.exceptions;
 
-import com.luidmidev.template.spring.services.questionnaires.exception.InvalidAnswersException;
+import com.waipersoft.questionnaires.exception.InvalidAnswersException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;

@@ -13,10 +13,7 @@ public class UpdateUser {
 
     private Boolean enabled;
 
-
-    @Pattern(regexp = "^(ADMIN|USER)$", message = "El rol solo puede ser ADMIN o USER")
     private String role;
-
 
     @Password(nullable = true)
     private String password;
