@@ -16,12 +16,10 @@ public class SessionAuditService {
     }
 
     public void saveActionUser(User user, String description) {
-
         var audit = SessionAudit.builder()
                 .user(user)
                 .description(description)
                 .build();
-
         repository.save(audit);
     }
 

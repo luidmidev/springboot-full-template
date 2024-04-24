@@ -4,6 +4,7 @@ package com.luidmidev.template.spring.controllers;
 import com.luidmidev.template.spring.exceptions.ClientException;
 import com.luidmidev.template.spring.utils.StringUtils;
 import com.waipersoft.store.FileStoreService;
+import com.waipersoft.store.FileStoreService.FileInfo;
 import com.waipersoft.store.targets.mongo.GridFSFileStoreService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,10 @@ import static com.waipersoft.store.FileStoreUtils.getHeaders;
 @RequestMapping("/files")
 public class FileController {
 
-    private final FileStoreService fileStoreService;
+    private final FileStoreService service;
 
-    FileController(GridFSFileStoreService fileService) {
-        this.fileStoreService = fileService;
+    FileController(GridFSFileStoreService service) {
+        this.service = service;
     }
 
     /**
@@ -37,7 +38,7 @@ public class FileController {
     @GetMapping("/{id}")
     public ResponseEntity<ByteArrayResource> download(@PathVariable String id, @RequestParam(required = false) String inline) throws IOException {
 
-        var loadFile = fileStoreService.download(id);
+        var loadFile = service.download(id);
 
         if (loadFile == null) {
             throw new ClientException("El recurso ya no esta disponible", HttpStatus.NOT_FOUND);
@@ -61,7 +62,7 @@ public class FileController {
         if (file == null) {
             throw new ClientException("No se ha enviado ningún archivo");
         }
-        return ResponseEntity.ok(fileStoreService.store(file));
+        return ResponseEntity.ok(service.store(file));
     }
 
     /**
@@ -72,13 +73,13 @@ public class FileController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable String id) {
-        fileStoreService.remove(id);
+        service.remove(id);
         return ResponseEntity.ok("Eliminado");
     }
 
     @GetMapping("/info/{id}")
-    public ResponseEntity<FileStoreService.FileInfo> info(@PathVariable String id) throws IOException {
-        var loadFile = fileStoreService.info(id);
+    public ResponseEntity<FileInfo> info(@PathVariable String id) throws IOException {
+        var loadFile = service.info(id);
         return ResponseEntity.ok(loadFile);
     }
 

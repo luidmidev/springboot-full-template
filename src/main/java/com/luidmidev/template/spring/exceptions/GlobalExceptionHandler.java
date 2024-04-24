@@ -3,8 +3,7 @@ package com.luidmidev.template.spring.exceptions;
 import com.waipersoft.questionnaires.exception.InvalidAnswersException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.security.core.AuthenticationException;
@@ -22,10 +21,9 @@ import java.util.function.Function;
 
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
+@Log4j2
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     private static final Function<ConstraintViolation<?>, ErrorResponse> constraintViolationToER = constraintViolation -> {
         var path = constraintViolation.getPropertyPath().toString().split("\\.");
@@ -34,7 +32,6 @@ public class GlobalExceptionHandler {
     };
 
     private static final Function<ObjectError, ErrorResponse> objectErrorErrorToER = error -> {
-
         if (error instanceof FieldError errField)
             return ErrorResponse.of(errField.getDefaultMessage(), errField.getField());
         else {
@@ -45,7 +42,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
-        logger.warn("Se recibió una excepción de AuthenticationException: {}", ex.getMessage());
+        log.warn("Se recibió una excepción de AuthenticationException: {}", ex.getMessage());
         return ResponseEntity.status(UNAUTHORIZED).body(ErrorResponse.of(ex.getMessage()));
     }
 
@@ -92,7 +89,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException ex) {
-        logger.warn("Se recibió una excepción de SQLIntegrityConstraintViolationException, se recomienda implementar el método onSQLIntegrityConstraintViolationException de la clase   GlobalExcepcionHandler para evitar fugas de información del esquema de base de datos: {}", ex.getMessage());
+        log.warn("Se recibió una excepción de SQLIntegrityConstraintViolationException, se recomienda implementar el método onSQLIntegrityConstraintViolationException de la clase   GlobalExcepcionHandler para evitar fugas de información del esquema de base de datos: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(ErrorResponse.of("Error en la consistencia de datos"));
     }
 

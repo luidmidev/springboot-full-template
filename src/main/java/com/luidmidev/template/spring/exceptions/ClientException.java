@@ -7,9 +7,9 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class ClientException extends RuntimeException {
 
-    private final ErrorResponse errorResponse;
+    private final transient ErrorResponse errorResponse;
 
-    private HttpStatus httpStatusCode = HttpStatus.BAD_REQUEST;
+    private final HttpStatus httpStatusCode;
 
     /**
      * Crear una excepción para errores que se pueden mostrar al cliente a partir de un mensaje
@@ -19,6 +19,7 @@ public class ClientException extends RuntimeException {
     public ClientException(String message) {
         super(message);
         errorResponse = ErrorResponse.of(message);
+        httpStatusCode = HttpStatus.BAD_REQUEST;
     }
 
 
@@ -31,7 +32,7 @@ public class ClientException extends RuntimeException {
     public ClientException(String message, HttpStatus httpStatusCode) {
         super(message);
         this.httpStatusCode = httpStatusCode;
-        errorResponse = ErrorResponse.of(message);
+        this.errorResponse = ErrorResponse.of(message);
     }
 
     /**
@@ -43,7 +44,7 @@ public class ClientException extends RuntimeException {
     public ClientException(String message, int httpStatusCode) {
         super(message);
         this.httpStatusCode = HttpStatus.valueOf(httpStatusCode);
-        errorResponse = ErrorResponse.of(message);
+        this.errorResponse = ErrorResponse.of(message);
     }
 
     /**
@@ -55,6 +56,7 @@ public class ClientException extends RuntimeException {
     public ClientException(String message, String target) {
         super(message);
         errorResponse = ErrorResponse.of(message, target);
+        httpStatusCode = HttpStatus.BAD_REQUEST;
     }
 
     /**

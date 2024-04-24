@@ -13,14 +13,16 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class ErrorResponse {
 
-    public String message;
-    public Integer status;
+    private final String message;
+    private final Integer status;
 
     @JsonInclude(Include.NON_NULL)
-    public Object target;
+    private final Object target;
+
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     /**
      * Crear un objeto de respuesta para errores de cliente a partir de un mensaje
@@ -30,6 +32,7 @@ public class ErrorResponse {
     public ErrorResponse(String message) {
         this.message = message;
         this.status = 400;
+        this.target = null;
     }
 
     /**
@@ -68,7 +71,7 @@ public class ErrorResponse {
      * @throws JsonProcessingException si ocurre un error al procesar el JSON
      */
     public static String jsonOf(String message) throws JsonProcessingException {
-        return new ObjectMapper().writeValueAsString(of(message));
+        return OBJECT_MAPPER.writeValueAsString(of(message));
     }
 
     /**
@@ -80,7 +83,7 @@ public class ErrorResponse {
      * @throws JsonProcessingException si ocurre un error al procesar el JSON
      */
     public static String jsonOf(String message, Object target) throws JsonProcessingException {
-        return new ObjectMapper().writeValueAsString(of(message, target));
+        return OBJECT_MAPPER.writeValueAsString(of(message, target));
     }
 
 

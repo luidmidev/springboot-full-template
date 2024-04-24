@@ -49,7 +49,7 @@ public class Jwt {
     private SecretKey getSigningKey() {
         log.info("Creating signing key with secret '{}'", key);
         var apiKeySecretBytes = DatatypeConverter.parseBase64Binary(key); // Clave secreta en bytes
-        return new SecretKeySpec(apiKeySecretBytes, "HmacSHA256"); // Clave secreta para firmar el token
+        return new SecretKeySpec(apiKeySecretBytes, "HmacSHA512"); // Clave secreta para firmar el token
     }
 
     /**
@@ -72,11 +72,11 @@ public class Jwt {
                 .issuedAt(now) // Fecha de creación del token
                 .subject(subject) // Asunto del token
                 .issuer(issuer) // Emisor del token
-                .signWith(signingKey, Jwts.SIG.HS256);  // Firma del token
+                .signWith(signingKey, Jwts.SIG.HS512);  // Firma del token
 
         if (ttlMillis >= 0) {
-            long expMillis = nowMillis + ttlMillis;
-            Date exp = new Date(expMillis);
+            var expMillis = nowMillis + ttlMillis;
+            var exp = new Date(expMillis);
             builder.expiration(exp);
         }
         return builder.compact();
@@ -89,7 +89,7 @@ public class Jwt {
      * @param jwt Token JWT del cual se obtiene el nombre de usuario.
      * @return El nombre de usuario del token.
      */
-    public String getID(String jwt) {
+    public String getId(String jwt) {
         log.debug("getting id from jwt '{}'", jwt);
         return getClaim(jwt, Claims::getId);
     }

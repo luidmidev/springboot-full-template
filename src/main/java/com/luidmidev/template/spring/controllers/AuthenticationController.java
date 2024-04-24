@@ -99,7 +99,6 @@ public class AuthenticationController {
      */
     @GetMapping(value = "/whoami")
     public ResponseEntity<User> whoami(@AuthenticationPrincipal User principals) {
-        principals.hidePassword();
         return ResponseEntity.ok().body(principals);
     }
 }

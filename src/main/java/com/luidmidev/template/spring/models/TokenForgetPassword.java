@@ -31,8 +31,8 @@ public class TokenForgetPassword {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    public Boolean isExpired() {
-        LocalDateTime now = LocalDateTime.now();
+    public boolean isExpired() {
+        var now = LocalDateTime.now();
         return now.isAfter(this.createdAt.plusMinutes(30));
     }
 

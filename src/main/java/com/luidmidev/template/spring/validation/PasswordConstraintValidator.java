@@ -11,7 +11,8 @@ import static org.passay.EnglishCharacterData.*;
 
 public class PasswordConstraintValidator implements ConstraintValidator<Password, String> {
 
-    private static final MessageResolver MESSAGE_RESOLVER;
+
+    private static final PasswordValidator VALIDATOR;
 
     private boolean nullable;
 
@@ -20,7 +21,15 @@ public class PasswordConstraintValidator implements ConstraintValidator<Password
             final InputStream inputStream = PasswordConstraintValidator.class.getClassLoader().getResourceAsStream("passay_messages_es.properties");
             Properties props = new Properties();
             props.load(inputStream);
-            MESSAGE_RESOLVER = new PropertiesMessageResolver(props);
+            VALIDATOR = new PasswordValidator(new PropertiesMessageResolver(props),
+                    new LengthRule(8, 30),
+                    new CharacterRule(UpperCase, 1),
+                    new CharacterRule(LowerCase, 1),
+                    new CharacterRule(Digit, 1),
+                    new CharacterRule(Special, 1),
+                    new CharacterRule(Alphabetical, 1),
+                    new WhitespaceRule()
+            );
         } catch (Exception e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -32,35 +41,19 @@ public class PasswordConstraintValidator implements ConstraintValidator<Password
     }
 
     @Override
-    public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(String s, ConstraintValidatorContext context) {
 
-        if (nullable) {
-            if (s == null) return true;
-            if (s.isEmpty()) return true;
-        }
-
-        var validator = new PasswordValidator(MESSAGE_RESOLVER,
-                new LengthRule(8, 30),
-                new CharacterRule(UpperCase, 1),
-                new CharacterRule(LowerCase, 1),
-                new CharacterRule(Digit, 1),
-                new CharacterRule(Special, 1),
-                new CharacterRule(Alphabetical, 1),
-                new WhitespaceRule()
-        );
-
+        if (nullable && (s == null || s.isBlank())) return true;
 
         var passwordData = new PasswordData(s == null ? "" : s);
-        var result = validator.validate(passwordData);
+        var result = VALIDATOR.validate(passwordData);
 
-        if (result.isValid()) {
-            return true;
-        }
+        if (result.isValid()) return true;
 
-        constraintValidatorContext.disableDefaultConstraintViolation();
+        context.disableDefaultConstraintViolation();
 
-        for (var message : validator.getMessages(result)) {
-            constraintValidatorContext.buildConstraintViolationWithTemplate(message).addConstraintViolation();
+        for (var message : VALIDATOR.getMessages(result)) {
+            context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
         }
 
         return false;

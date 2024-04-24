@@ -54,7 +54,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
-            <version>3.2.4</version>
         </dependency>
 
         <dependency>
@@ -134,14 +133,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.waipersoft</groupId>
             <artifactId>questionnaires</artifactId>
-            <version>0.0.2</version>
+            <version>0.0.3</version>
         </dependency>
 
         <dependency>
@@ -153,7 +147,19 @@
         <dependency>
             <groupId>com.waipersoft</groupId>
             <artifactId>store</artifactId>
+            <version>0.0.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.waipersoft</groupId>
+            <artifactId>email</artifactId>
             <version>0.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
 
     </dependencies>

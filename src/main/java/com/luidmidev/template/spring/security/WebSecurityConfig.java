@@ -21,12 +21,17 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.*;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
@@ -40,14 +45,12 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 public class WebSecurityConfig {
     private final UserService securityUserDetailsService;
     private final JwtOncePerRequestFilter jwtAuthenticationFilter;
-    private final Argon2CustomPasswordEncoder argon2CustomPasswordEncoder;
     private final EnvironmentChecker environmentChecker;
 
     @Autowired
-    WebSecurityConfig(UserService securityUserDetailsService, JwtOncePerRequestFilter jwtAuthenticationFilter, Argon2CustomPasswordEncoder argon2CustomPasswordEncoder, EnvironmentChecker environmentChecker) {
+    WebSecurityConfig(UserService securityUserDetailsService, JwtOncePerRequestFilter jwtAuthenticationFilter, EnvironmentChecker environmentChecker) {
         this.securityUserDetailsService = securityUserDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.argon2CustomPasswordEncoder = argon2CustomPasswordEncoder;
         this.environmentChecker = environmentChecker;
     }
 
@@ -121,13 +124,6 @@ public class WebSecurityConfig {
         return http.build();
     }
 
-    /**
-     * Configuración de origen cruzado (CORS) para el desarrollo.
-     * Usar solo durante el desarrollo, se permite el origen localhost:3000 ya que el frontend de la aplicación web esta siendo realizada en React y
-     * durante el desarollo se necesita desabilitar el origen cruzado debido a las politicas de los navegadores webs
-     *
-     * @return Fuente de configuración CORS.
-     */
     public CorsConfigurationSource corsConfigurationSource() {
 
         var source = new UrlBasedCorsConfigurationSource();
@@ -147,29 +143,29 @@ public class WebSecurityConfig {
         return source;
     }
 
-    /**
-     * Crea un AuthenticationManager utilizando la configuración de autenticación proporcionada.
-     *
-     * @param configuration Configuración de autenticación.
-     * @return AuthenticationManager creado.
-     * @throws Exception Si se produce un error al obtener el AuthenticationManager.
-     */
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
-    /**
-     * Crea un AuthenticationProvider que utiliza el PMSUserDetailsService y el Argon2CustomPasswordEncoder.
-     *
-     * @return AuthenticationProvider creado.
-     */
+
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
         var authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(securityUserDetailsService);
-        authenticationProvider.setPasswordEncoder(argon2CustomPasswordEncoder);
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
         return authenticationProvider;
+    }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        var encodingId = "argon2";
+        var encoders = new HashMap<String, PasswordEncoder>();
+        encoders.put("bcrypt", new BCryptPasswordEncoder());
+        encoders.put("pbkdf2", Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8());
+        encoders.put("scrypt", SCryptPasswordEncoder.defaultsForSpringSecurity_v5_8());
+        encoders.put("argon2", Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8());
+        return new DelegatingPasswordEncoder(encodingId, encoders);
     }
 }

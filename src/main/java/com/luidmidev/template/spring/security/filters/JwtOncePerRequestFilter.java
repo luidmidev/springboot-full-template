@@ -58,7 +58,6 @@ public class JwtOncePerRequestFilter extends OncePerRequestFilter {
         final String authenticationHeader = request.getHeader("Authorization");
 
         if (authenticationHeader == null || !authenticationHeader.startsWith("Bearer ")) {
-
             filterChain.doFilter(request, response);
             return;
         }
@@ -90,7 +89,6 @@ public class JwtOncePerRequestFilter extends OncePerRequestFilter {
 
     private void writeError(Integer code, String message, HttpServletResponse response) throws IOException {
         String json = ErrorResponse.jsonOf(message);
-        log.info("Error de autenticación: " + json);
         response.setStatus(code);
         response.getWriter().write(json);
     }
