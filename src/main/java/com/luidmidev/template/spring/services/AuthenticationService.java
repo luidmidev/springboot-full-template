@@ -98,10 +98,7 @@ public class AuthenticationService {
                 .lastname("Administrador")
                 .email("playerluis159@gmail.com")
                 .enabled(true)
-                .accountNonExpired(true)
-                .accountNonLocked(true)
-                .credentialsNonExpired(true)
-                .role(adminRole)
+                .authorities(List.of(adminRole))
                 .cedula("2300826357")
                 .build();
 
