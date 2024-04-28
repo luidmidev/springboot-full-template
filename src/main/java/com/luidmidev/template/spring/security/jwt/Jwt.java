@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -19,12 +19,6 @@ import java.util.function.Function;
 @Log4j2
 @Component
 public class Jwt {
-
-    /**
-     * Clave secreta utilizada para firmar los tokens JWT.
-     */
-    @Value("${security.jwt.secret}")
-    private String key;
 
     /**
      * Emisor del token JWT.
@@ -38,18 +32,26 @@ public class Jwt {
     @Value("${security.jwt.ttlMillis}")
     private long ttlMillis;
 
+
+    /**
+     * Clave secreta utilizada para firmar el token JWT.
+     */
     private SecretKey signingKey;
 
     @PostConstruct
-    private void init() {
+    private void init() throws NoSuchAlgorithmException {
         signingKey = getSigningKey();
+        final byte[] key = signingKey.getEncoded();
+        final StringBuilder keyString = new StringBuilder();
+        for (byte b : key) keyString.append(String.format("%02X", b));
+        log.info("JWT signing key: {}", keyString);
     }
 
 
-    private SecretKey getSigningKey() {
-        log.info("Creating signing key with secret '{}'", key);
-        var apiKeySecretBytes = DatatypeConverter.parseBase64Binary(key); // Clave secreta en bytes
-        return new SecretKeySpec(apiKeySecretBytes, "HmacSHA512"); // Clave secreta para firmar el token
+    private SecretKey getSigningKey() throws NoSuchAlgorithmException {
+        return Jwts.SIG.HS512.key()
+                .random(SecureRandom.getInstanceStrong())
+                .build();
     }
 
     /**
@@ -116,6 +118,21 @@ public class Jwt {
     private <T> T getClaim(String jwt, Function<Claims, T> claimsResolver) {
         var claims = getAllClaims(jwt);
         return claimsResolver.apply(claims);
+    }
+
+
+    /**
+     * Obtiene un reclamo específico del token JWT.
+     *
+     * @param jwt           Token JWT del cual se obtendrá el reclamo.
+     * @param claimName     Nombre del reclamo que se desea obtener.
+     * @param clazz         Tipo de dato del reclamo que se desea obtener.
+     * @return El reclamo específico del token JWT.
+     * @param <T>           Tipo de dato del reclamo que se desea obtener.
+     */
+    private <T> T getClaim(String jwt, String claimName, Class<T> clazz) {
+        var claims = getAllClaims(jwt);
+        return claims.get(claimName, clazz);
     }
 
     /**

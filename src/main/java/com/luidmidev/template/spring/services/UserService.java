@@ -152,7 +152,7 @@ public class UserService implements UserDetailsService {
     /**
      * Carga los detalles de un usuario por su nombre de usuario.
      * <p>
-     * El método loadUserByUsername() se utiliza para cargar los detalles del usuario basados en el nombre de usuario.
+     * Este metod  se utiliza para cargar los detalles del usuario basados en el nombre de usuario.
      * Luego, estos detalles se utilizan para autenticar al usuario en el contexto de seguridad
      * de Spring y permitir el acceso a los recursos protegidos.
      *

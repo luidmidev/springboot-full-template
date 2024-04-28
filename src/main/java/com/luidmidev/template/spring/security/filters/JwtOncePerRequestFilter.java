@@ -11,7 +11,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,7 +29,6 @@ import java.io.IOException;
 @Component
 public class JwtOncePerRequestFilter extends OncePerRequestFilter {
     private final Jwt jwt;
-    @Getter
     private final UserService userDetailsService;
 
 
@@ -46,7 +44,7 @@ public class JwtOncePerRequestFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Método que se ejecuta para cada solicitud HTTP y realiza la validación y procesamiento del token JWT.
+     * Metodo que se ejecuta para cada solicitud HTTP y realiza la validación y procesamiento del token JWT.
      *
      * @param request     Objeto HttpServletRequest que representa la solicitud HTTP actual.
      * @param response    Objeto HttpServletResponse que representa la respuesta HTTP actual.

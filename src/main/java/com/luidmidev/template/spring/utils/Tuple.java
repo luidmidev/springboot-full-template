@@ -21,7 +21,7 @@ public class Tuple<T1, T2> {
         return new Tuple<>(first, null);
     }
 
-    public static <T1, T2> Tuple<T1, T2> of() {
+    public static <T1, T2> Tuple<T1, T2> empty() {
         return new Tuple<>(null, null);
     }
 }
